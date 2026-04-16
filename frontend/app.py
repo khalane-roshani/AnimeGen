@@ -341,10 +341,10 @@ with col3:
 
        # Initialize session state
         if "input_image" not in st.session_state:
-            st.session_state.input_image = "Roshani.jpeg"
+            st.session_state.input_image = get_image_path("Roshani.jpeg")
 
         if "output_image" not in st.session_state:
-            st.session_state.output_image = "roshani_output.jpg"
+            st.session_state.input_image = get_image_path("roshani_output.jpg")
 
         if "converted" not in st.session_state:
             st.session_state.converted = False
@@ -366,7 +366,7 @@ with col3:
             if uploaded_file is not None:
                 image = Image.open(uploaded_file)
                 image.save("temp_input.jpg")
-                st.session_state.input_image = "temp_input.jpg"
+                st.session_state.input_image = get_image_path("temp_input.jpg")
 
             # UI Layout
             one, left, right, second = st.columns([0.2, 2, 2, 0.1])
@@ -413,7 +413,7 @@ with col3:
 
                 selected_style = st.session_state.get("option", "DREAMY ANIME")
 
-                with st.spinner(f"✨ Applying {selected_style} style... Please wait..."):
+                with st.spinner(f"Applying {selected_style} style... Please wait..."):
 
                     if selected_style == "DREAMY ANIME":
                         run_model(input_path, output_path)
