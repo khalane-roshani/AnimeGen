@@ -234,9 +234,17 @@ div.stDownloadButton > button:hover {
 </style>
 """, unsafe_allow_html=True)
    
-st.markdown("""
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+image_path = os.path.join(BASE_DIR, "camera.png")
+
+with open(image_path, "rb") as f:
+    img_base64 = base64.b64encode(f.read()).decode()
+
+st.markdown(f"""
     <div class="main-header" style="display: flex; align-items: center; gap: 20px; height:100px; margin-top:20px;">
-    <img src="data:image/png;base64,{}" class="header-icon"/>
+    
+    <img src="data:image/png;base64,{img_base64}" class="header-icon"/>
+    
     <div class="center-text">
         <div class="header-subtitle">
             IMAGE TO ANIME CONVERTOR
@@ -251,11 +259,9 @@ st.markdown("""
             <br>CHOOSE YOUR CARTOON STYLE
         </div>
     </div>
+    
     </div>
-    """.format(
-    __import__("base64").b64encode(open("camera.png", "rb").read()).decode()
-), unsafe_allow_html=True)
-
+""", unsafe_allow_html=True)
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 with st.container():
