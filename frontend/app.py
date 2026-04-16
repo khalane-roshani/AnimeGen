@@ -340,11 +340,12 @@ with col3:
     # st.button("UPLOAD YOUR PHOTO")
 
        # Initialize session state
+                # ---------- SESSION INIT ----------
         if "input_image" not in st.session_state:
             st.session_state.input_image = get_image_path("Roshani.jpeg")
 
         if "output_image" not in st.session_state:
-            st.session_state.input_image = get_image_path("roshani_output.jpg")
+            st.session_state.output_image = get_image_path("roshani_output.jpg")
 
         if "converted" not in st.session_state:
             st.session_state.converted = False
@@ -352,7 +353,7 @@ with col3:
         if "option" not in st.session_state:
             st.session_state.option = "DREAMY ANIME"
 
-
+        # ---------- DIALOG ----------
         @st.dialog("ANIME CONVERTOR", width="medium")
         def vote(item):
 
@@ -362,35 +363,43 @@ with col3:
                 label_visibility="collapsed"
             )
 
-            # Update input image if user uploads
+            # SAVE UPLOADED IMAGE SAFELY
             if uploaded_file is not None:
                 image = Image.open(uploaded_file)
-                image.save("temp_input.jpg")
-                st.session_state.input_image = get_image_path("temp_input.jpg")
 
-            # UI Layout
+                temp_path = get_image_path("temp_input.jpg")
+                image.save(temp_path)
+
+                st.session_state.input_image = temp_path
+
+            # ---------- UI ----------
             one, left, right, second = st.columns([0.2, 2, 2, 0.1])
 
-            # LEFT → Input Image
+            # INPUT IMAGE
             with left:
-                img = Image.open(st.session_state.input_image)
+                if os.path.exists(st.session_state.input_image):
+                    img = Image.open(st.session_state.input_image)
+                else:
+                    img = Image.open(get_image_path("Roshani.jpeg"))
+
                 img = img.resize((300, 300))
                 st.image(img, caption="Input Image")
 
-            # RIGHT → Output Image
+            # OUTPUT IMAGE
             with right:
-                if st.session_state.get("converted", False):
+                if st.session_state.get("converted", False) and os.path.exists(st.session_state.output_image):
                     img = Image.open(st.session_state.output_image)
                 else:
-                    img = Image.open("roshani_output.jpg")  # default image
+                    img = Image.open(get_image_path("roshani_output.jpg"))
 
                 img = img.resize((300, 300))
                 st.image(img, caption="Output Image")
 
+                # DOWNLOAD BUTTON
                 if st.session_state.get("converted", False):
 
-                    def get_image_bytes(image_path):
-                        img = Image.open(image_path)
+                    def get_image_bytes(path):
+                        img = Image.open(path)
                         buf = BytesIO()
                         img.save(buf, format="JPEG")
                         return buf.getvalue()
@@ -400,20 +409,18 @@ with col3:
                     st.download_button(
                         label="DOWNLOAD IMAGE",
                         data=image_bytes,
-                        file_name=f"anime_output_{uuid.uuid4().hex[:6]}.jpg",
+                        file_name=f"anime_{uuid.uuid4().hex[:6]}.jpg",
                         mime="image/jpeg"
                     )
 
-            # BUTTON FUNCTION
+            # ---------- MODEL FUNCTION ----------
             def my_function():
                 input_path = st.session_state.input_image
+                output_path = get_image_path(f"output_{uuid.uuid4().hex}.jpg")
 
-                # Create unique output file
-                output_path = f"output_{uuid.uuid4().hex}.jpg"
+                selected_style = st.session_state.option
 
-                selected_style = st.session_state.get("option", "DREAMY ANIME")
-
-                with st.spinner(f"Applying {selected_style} style... Please wait..."):
+                with st.spinner(f"Applying {selected_style}..."):
 
                     if selected_style == "DREAMY ANIME":
                         run_model(input_path, output_path)
@@ -424,35 +431,34 @@ with col3:
                     elif selected_style == "CINEMATIC ANIME":
                         run_model_cinematic(input_path, output_path)
 
-                # Save output
                 st.session_state.output_image = output_path
                 st.session_state.converted = True
 
-            # Controls
+            # ---------- CONTROLS ----------
             selectbox, none, button = st.columns([1.5, 0.5, 1])
 
             with selectbox:
-                option = st.selectbox(
-                        " ",
-                        ("DREAMY ANIME", "NEON FANTASY", "CINEMATIC ANIME"),
-                        key="option"
-                        )
+                st.selectbox(
+                    " ",
+                    ("DREAMY ANIME", "NEON FANTASY", "CINEMATIC ANIME"),
+                    key="option"
+                )
 
             with button:
                 if st.button("CONVERT IMAGE"):
-                    with st.spinner("Converting..."):
-                        my_function()
+                    my_function()
 
+        # ---------- RESET ----------
         def reset_state():
-                st.session_state.input_image = "Roshani.jpeg"
-                st.session_state.output_image = "roshani_output.jpg"
-                st.session_state.converted = False
-                st.session_state.option = "DREAMY ANIME"
-                
-                # Open dialog
+            st.session_state.input_image = get_image_path("Roshani.jpeg")
+            st.session_state.output_image = get_image_path("roshani_output.jpg")
+            st.session_state.converted = False
+            st.session_state.option = "DREAMY ANIME"
+
+        # ---------- MAIN BUTTON ----------
         if st.button("UPLOAD YOUR PHOTO"):
             reset_state()
-            vote("UPLOAD YOUR PHOTO")
+            vote("UPLOAD")
         
 with col4:
     img = get_base64_image("cinematic.jpg")
