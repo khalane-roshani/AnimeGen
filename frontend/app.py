@@ -237,6 +237,17 @@ div.stDownloadButton > button:hover {
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 image_path = os.path.join(BASE_DIR, "camera.png")
 
+
+def get_image_path(filename):
+    return os.path.join(BASE_DIR, filename)
+
+def get_base64_image(filename):
+    try:
+        with open(get_image_path(filename), "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    except:
+        return "" 
+
 with open(image_path, "rb") as f:
     img_base64 = base64.b64encode(f.read()).decode()
 
@@ -297,29 +308,30 @@ with col1:
                     st.image(image, width=300)  
 
 with col2:
-    st.markdown("""
-        <div class="style-card">
-            <div class="card-title">1. DREAMY ANIME STYLE</div>
-            <div class="card-subtitle">(Soft Dreamy Magic)</div>
-            <img src="data:image/png;base64,{}" class="card-icon"/>
-            <div class="button">CONVERT TO DREAMY 🌿</div>
-        </div>
-    """.format(
-    __import__("base64").b64encode(open("dreamy.jpg", "rb").read()).decode()
-), unsafe_allow_html=True)
+    img = get_base64_image("dreamy.jpg")
+
+    st.markdown(f"""
+    <div class="style-card">
+        <div class="card-title">1. DREAMY ANIME STYLE</div>
+        <div class="card-subtitle">(Soft Dreamy Magic)</div>
+        <img src="data:image/png;base64,{img}" class="card-icon"/>
+        <div class="button">CONVERT TO DREAMY 🌿</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
+# NEON
 with col3:
-    st.markdown("""
-        <div class="style-card">
-            <div class="card-title">2. NEON FANTASY STYLE</div>
-            <div class="card-subtitle">(Vibrant Surreal Colors)</div>
-            <img src="data:image/png;base64,{}" class="card-icon"/>
-            <div class="button">CONVERT TO NEON 🌈</div>
-        </div>
-    """.format(
-    __import__("base64").b64encode(open("neon.jpg", "rb").read()).decode()
-), unsafe_allow_html=True)  
+    img = get_base64_image("neon.jpg")
+
+    st.markdown(f"""
+    <div class="style-card">
+        <div class="card-title">2. NEON FANTASY STYLE</div>
+        <div class="card-subtitle">(Vibrant Surreal Colors)</div>
+        <img src="data:image/png;base64,{img}" class="card-icon"/>
+        <div class="button">CONVERT TO NEON 🌈</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     
     _, center_col, _ = st.columns([0.5,2,0.5])
@@ -443,17 +455,22 @@ with col3:
             vote("UPLOAD YOUR PHOTO")
         
 with col4:
-    st.markdown("""
-        <div class="style-card">
-            <div class="card-title">3. CINEMATIC ANIME STYLE</div>
-            <div class="card-subtitle">(Realistic Dramatic Scenes)</div>
-            <img src="data:image/png;base64,{}" class="card-icon"/>
-            <div class="button">CONVERT TO CINEMATIC 🎬</div>
-        </div>
-    """.format(
-    __import__("base64").b64encode(open("cinematic.jpg", "rb").read()).decode()
-), unsafe_allow_html=True)
+    img = get_base64_image("cinematic.jpg")
+
+    st.markdown(f"""
+    <div class="style-card">
+        <div class="card-title">3. CINEMATIC ANIME STYLE</div>
+        <div class="card-subtitle">(Realistic Dramatic Scenes)</div>
+        <img src="data:image/png;base64,{img}" class="card-icon"/>
+        <div class="button">CONVERT TO CINEMATIC 🎬</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# st.divider()
+# st.markdown("""
+#         <div style="font-size:16px;color: #555; margin:10px; text-align:right;align:bottom;">
+#             © 2026 AnimeGen - Developed by Roshani Khalane
+#         </div>
+# """, unsafe_allow_html=True)
     
-
-
     
