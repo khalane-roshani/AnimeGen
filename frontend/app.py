@@ -280,14 +280,18 @@ with col1:
      with st.container():
             one, left, right,two = st.columns([0.01,1,1,0.01])
 
+            BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
             with left:
-                    image = Image.open("original_girl.png")
+                    image_path = os.path.join(BASE_DIR, "original_girl.png")
+                    image = Image.open(image_path)
                     image = image.resize((300,300))
 
                     st.image(image, width=300)
 
             with right:
-                    image = Image.open("converted_girl.jpg")
+                    image_path = os.path.join(BASE_DIR, "original_girl.png")
+                    image = Image.open(image_path)
                     image = image.resize((300,300))
 
                     st.image(image, width=300)  
@@ -451,11 +455,5 @@ with col4:
 ), unsafe_allow_html=True)
     
 
-# st.divider()
-# st.markdown("""
-#         <div style="font-size:16px;color: #555; margin:10px; text-align:right;align:bottom;">
-#             © 2026 AnimeGen - Developed by Roshani Khalane
-#         </div>
-# """, unsafe_allow_html=True)
-    
+
     
