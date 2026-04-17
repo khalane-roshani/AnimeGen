@@ -301,7 +301,7 @@ with col1:
                     st.image(image, width=300)
 
             with right:
-                    image_path = os.path.join(BASE_DIR, "original_girl.png")
+                    image_path = os.path.join(BASE_DIR, "converted_girl.jpg")
                     image = Image.open(image_path)
                     image = image.resize((300,300))
 
@@ -341,11 +341,11 @@ with col3:
 
        # Initialize session state
                 # ---------- SESSION INIT ----------
-        if "input_image" not in st.session_state:
-            st.session_state.input_image = get_image_path("Roshani.jpeg")
+        if "input_image" not in st.session_state or not os.path.exists(st.session_state.input_image):
+            st.session_state.input_image = get_image_path("2.jpg")
 
         if "output_image" not in st.session_state:
-            st.session_state.output_image = get_image_path("roshani_output.jpg")
+            st.session_state.output_image = get_image_path("3.jpg")
 
         if "converted" not in st.session_state:
             st.session_state.converted = False
@@ -353,9 +353,16 @@ with col3:
         if "option" not in st.session_state:
             st.session_state.option = "DREAMY ANIME"
 
+        if "dialog_opened" not in st.session_state:
+            st.session_state.dialog_opened = False
+        
+        if "run_conversion" not in st.session_state:
+            st.session_state.run_conversion = False
+
         # ---------- DIALOG ----------
         @st.dialog("ANIME CONVERTOR", width="medium")
         def vote(item):
+            st.session_state.dialog_opened = False
 
             uploaded_file = st.file_uploader(
                 "Upload Image",
@@ -367,7 +374,7 @@ with col3:
             if uploaded_file is not None:
                 image = Image.open(uploaded_file)
 
-                temp_path = get_image_path("temp_input.jpg")
+                temp_path = get_image_path(f"temp_{uuid.uuid4().hex}.jpg")
                 image.save(temp_path)
 
                 st.session_state.input_image = temp_path
@@ -380,7 +387,7 @@ with col3:
                 if os.path.exists(st.session_state.input_image):
                     img = Image.open(st.session_state.input_image)
                 else:
-                    img = Image.open(get_image_path("Roshani.jpeg"))
+                    img = Image.open(get_image_path("2.jpg"))
 
                 img = img.resize((300, 300))
                 st.image(img, caption="Input Image")
@@ -390,7 +397,7 @@ with col3:
                 if st.session_state.get("converted", False) and os.path.exists(st.session_state.output_image):
                     img = Image.open(st.session_state.output_image)
                 else:
-                    img = Image.open(get_image_path("roshani_output.jpg"))
+                    img = Image.open(get_image_path("3.jpg"))
 
                 img = img.resize((300, 300))
                 st.image(img, caption="Output Image")
@@ -413,6 +420,7 @@ with col3:
                         mime="image/jpeg"
                     )
 
+
             # ---------- MODEL FUNCTION ----------
             def my_function():
                 input_path = st.session_state.input_image
@@ -420,16 +428,14 @@ with col3:
 
                 selected_style = st.session_state.option
 
-                with st.spinner(f"Applying {selected_style}..."):
+                if selected_style == "DREAMY ANIME":
+                    run_model(input_path, output_path)
 
-                    if selected_style == "DREAMY ANIME":
-                        run_model(input_path, output_path)
+                elif selected_style == "NEON FANTASY":
+                    run_model(input_path, output_path)
 
-                    elif selected_style == "NEON FANTASY":
-                        run_model(input_path, output_path)
-
-                    elif selected_style == "CINEMATIC ANIME":
-                        run_model_cinematic(input_path, output_path)
+                elif selected_style == "CINEMATIC ANIME":
+                    run_model_cinematic(input_path, output_path)
 
                 st.session_state.output_image = output_path
                 st.session_state.converted = True
@@ -446,18 +452,34 @@ with col3:
 
             with button:
                 if st.button("CONVERT IMAGE"):
+                    st.session_state.run_conversion = True
+
+            
+            if st.session_state.run_conversion:
+                
+                st.session_state.run_conversion = False  
+
+                with st.spinner(f"Applying {st.session_state.option}..."):
                     my_function()
+                
+                st.session_state.dialog_opened = True
+                st.rerun()
+
 
         # ---------- RESET ----------
         def reset_state():
-            st.session_state.input_image = get_image_path("Roshani.jpeg")
-            st.session_state.output_image = get_image_path("roshani_output.jpg")
+            st.session_state.input_image = get_image_path("2.jpg")
+            st.session_state.output_image = get_image_path("3.jpg")
             st.session_state.converted = False
             st.session_state.option = "DREAMY ANIME"
 
         # ---------- MAIN BUTTON ----------
         if st.button("UPLOAD YOUR PHOTO"):
+            st.session_state.dialog_opened = True
             reset_state()
+            vote("UPLOAD")
+        
+        if st.session_state.dialog_opened:
             vote("UPLOAD")
         
 with col4:
